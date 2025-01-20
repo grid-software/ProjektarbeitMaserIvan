@@ -42,8 +42,8 @@ def register():
                 mydb.close()
     return render_template('register.html', title='Registrieren', form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/')  # Route für die Startseite
+def login():  # Die login()-Funktion wird nun als Startseite verwendet
     form = LoginForm()
     if form.validate_on_submit():
         try:
@@ -75,7 +75,7 @@ def login():
                 mydb.close()
     return render_template('login.html', title='Anmelden', form=form)
 
-@app.route('/')
+@app.route('/index')
 def index():
     return "Willkommen!"  # Oder render_template('index.html') für eine Startseite
 
