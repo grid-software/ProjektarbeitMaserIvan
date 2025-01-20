@@ -42,9 +42,10 @@ def register():
                 mydb.close()
     return render_template('register.html', title='Registrieren', form=form)
 
-@app.route('/')  # Route für die Startseite
+@app.route('/', methods=['GET', 'POST'])  # Route für die Startseite mit GET und POST Methoden
 def login():  # Die login()-Funktion wird nun als Startseite verwendet
     form = LoginForm()
+    error = None  # Variable für die Fehlermeldung
     if form.validate_on_submit():
         try:
             mydb = mysql.connector.connect(
@@ -65,7 +66,7 @@ def login():  # Die login()-Funktion wird nun als Startseite verwendet
                 # Weiterleitung zur Startseite oder Dashboard nach erfolgreicher Anmeldung
                 return redirect(url_for('index')) 
             else:
-                flash('Ungültige E-Mail-Adresse oder Passwort')
+                error = 'Ungültige E-Mail-Adresse oder Passwort'  # Fehlermeldung setzen
         except mysql.connector.Error as err:
             print(f"Fehler bei der Datenbankabfrage: {err}")
             flash('Fehler bei der Anmeldung. Bitte versuchen Sie es erneut.')
@@ -73,7 +74,7 @@ def login():  # Die login()-Funktion wird nun als Startseite verwendet
             if mydb.is_connected():
                 cursor.close()
                 mydb.close()
-    return render_template('login.html', title='Anmelden', form=form)
+    return render_template('login.html', title='Anmelden', form=form, error=error)  # Fehlermeldung an Template übergeben
 
 @app.route('/index')
 def index():
