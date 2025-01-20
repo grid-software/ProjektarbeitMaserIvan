@@ -17,6 +17,9 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-    <p><a href="{{ url_for('register') }}">Oder Registrieren</a></p>  
+    <p><a href="{{ url_for('register') }}">Oder Registrieren</a></p>
+    {% if error %}  
+        <p style="color: red;">{{ error }}</p>  
+    {% endif %}  
 </body>
 </html>
