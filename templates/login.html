@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }} - Anmelden</title>
+</head>
+<body>
+    <h1>Anmelden</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=64) }}
+        </p>
+        <p>
+            {{ form.kennwort.label }}<br>
+            {{ form.kennwort(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</body>
+</html>

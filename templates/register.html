@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }} - Registrierung</title>
+</head>
+<body>
+    <h1>Registrieren</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.vorname.label }}<br>
+            {{ form.vorname(size=32) }}
+        </p>
+        <p>
+            {{ form.nachname.label }}<br>
+            {{ form.nachname(size=32) }}
+        </p>
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=64) }}
+        </p>
+        <p>
+            {{ form.plz.label }}<br>  
+            {{ form.plz(size=5) }} 
+        </p>
+        <p>
+            {{ form.stadt.label }}<br>
+            {{ form.stadt(size=32) }}
+        </p>
+        <p>
+            {{ form.strasse.label }}<br>
+            {{ form.strasse(size=64) }}
+        </p>
+        <p>
+            {{ form.kennwort.label }}<br>
+            {{ form.kennwort(size=32) }}
+        </p>
+        <p>
+            {{ form.kennwort2.label }}<br>
+            {{ form.kennwort2(size=32) }}
+        </p>
+        <p>
+            {{ form.rolle.label }}<br>
+            {{ form.rolle }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</body>
+</html>
