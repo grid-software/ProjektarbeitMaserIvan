@@ -68,8 +68,9 @@ def index():
             mydb.close()
             return render_template('ticketseite.html', user_id=user_id, tickets=tickets)
     else:
-        # Benutzer ist nicht angemeldet
-        return redirect(url_for('login'))
+
+        return redirect((url_for('login')))
+
     
 
 @app.route('/register', methods=['GET', 'POST'])
