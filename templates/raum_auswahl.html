@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ title }}</title>
+</head>
+<body>
+  <h1>{{ title }}</h1>
+  <p>Bitte wählen Sie die Räume aus, die Sie betreuen möchten:</p>
+  <form method="POST">
+    {% for raum in räume %}
+      <input type="checkbox" name="räume" value="{{ raum[0] }}"> {{ raum[1] }}<br>
+    {% endfor %}
+    <br>
+    <input type="submit" value="Räume zuweisen">
+  </form>
+</body>
+</html>
