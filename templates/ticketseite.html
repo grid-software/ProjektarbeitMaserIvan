@@ -10,25 +10,49 @@
     <p>Angemeldet als Benutzer {{ user_id }}</p>
     <a href="{{ url_for('logout') }}"><button>Abmelden</button></a>
 
+    {% if rolle == 1 %}  
+      <h2>Ticket erstellen:</h2>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>
+          {{ form.titel.label }}<br>
+          {{ form.titel(size=64) }}
+        </p>
+        <p>
+          {{ form.beschreibung.label }}<br>
+          {{ form.beschreibung(rows=5, cols=64) }}
+        </p>
+        <p>
+          {{ form.raum.label }}<br>
+          {{ form.raum }}
+        </p>
+        <p><input type="submit" value="Bestätigen"></p>
+      </form>
+    {% endif %}
+
     <h2>Ihre Tickets:</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Ticket-ID</th>
-          <th>Titel</th>
-          <th>Status</th>
-          </tr>
-      </thead>
-      <tbody>
-        {% for ticket in tickets %}
-          <tr>
-            <td>{{ ticket[0] }}</td>  
-            <td>{{ ticket[1] }}</td>
-            <td>{{ ticket[2] }}</td>  
-            </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<table>
+  <thead>
+    <tr>
+      <th>Ticket-ID</th>
+      <th>Titel</th>
+      <th>Status</th>
+      <th>Raum</th>  
+      <th>Lehrer</th>  
+    </tr>
+  </thead>
+  <tbody>
+    {% for ticket in tickets %}
+      <tr>
+        <td>{{ ticket[0] }}</td>
+        <td>{{ ticket[1] }}</td>
+        <td>{{ ticket[2] }}</td>
+        <td>{{ ticket[3] }}</td>  
+        <td>{{ ticket[4] }} {{ ticket[5] }}</td>  
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
   {% endif %}
 </body>
 </html>

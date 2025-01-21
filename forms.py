@@ -1,6 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, SelectMultipleField, fields
+from config import Config
+from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.validators import DataRequired, Email, EqualTo
+import mysql.connector
 
 class RegistrationForm(FlaskForm):
     vorname = StringField('Vorname', validators=[DataRequired()])
@@ -21,18 +24,22 @@ class LoginForm(FlaskForm):
     kennwort = PasswordField('Kennwort', validators=[DataRequired()])
     submit = SubmitField('Anmelden')
 
-def __init__(self, *args, **kwargs):
-        super(RegistrationForm, self).__init__(*args, **kwargs)
-        mydb = get_db_connection()  # Datenbankverbindung holen
+class TicketForm(FlaskForm):
+    titel = StringField('Titel', validators=[DataRequired()])
+    beschreibung = fields.TextAreaField('Beschreibung', validators=[DataRequired()])
+    raum = SelectField('Raum', choices=[], validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(TicketForm, self).__init__(*args, **kwargs)
+        mydb = mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="",
+            database="ticketsystem"
+        )
         cursor = mydb.cursor()
-
-        # Raumauswahl nur anzeigen, wenn die Rolle "Raumbetreuer" ist
-        if self.rolle.data == 'Raumbetreuer':
-            print("test test123")
-            # Nur freie Räume laden
-            cursor.execute("SELECT id, raum_code FROM raum WHERE raumbetreuuer IS NULL")  
-            räume = cursor.fetchall()
-            self.räume.choices = [(raum[0], raum[1]) for raum in räume]  # choices für SelectMultipleField setzen
-
+        cursor.execute("SELECT id, raum_code FROM raum")  # Abfrage für die Raumauswahl
+        räume = cursor.fetchall()
+        self.raum.choices = [(raum[0], raum[1]) for raum in räume]
         cursor.close()
         mydb.close()

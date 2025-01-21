@@ -1,8 +1,9 @@
 from flask import Flask, render_template, flash, redirect, url_for, request, jsonify, session
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, TicketForm
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
+from wtforms import fields
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,23 +20,56 @@ def get_db_connection():
     return mydb
 
 @app.route('/', methods=['GET','POST'])
-def Ticketsystem():
+@app.route('/')
+def index():
     if 'user_id' in session:
+        # Benutzer ist angemeldet
         user_id = session['user_id']
         mydb = get_db_connection()
         cursor = mydb.cursor()
 
-        # Hier musst du die Abfrage an deine Tabellenstruktur anpassen
-        cursor.execute("SELECT t.id, t.title, s.beschreibung as status FROM ticket t JOIN `user` u ON t.user_id = u.id JOIN status s ON t.status_id = s.id WHERE u.id = %s", (user_id,))
+        # Abrufen der Tickets für den angemeldeten Benutzer
+        cursor.execute("""
+            SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname 
+            FROM ticket t 
+            JOIN `user` u ON t.user_id = u.id 
+            JOIN status s ON t.status_id = s.id 
+            JOIN raum r ON t.raum_id = r.id  
+            WHERE t.user_id = %s
+        """, (user_id,))
+        tickets = cursor.fetchall() 
         tickets = cursor.fetchall()
 
-        cursor.close()
-        mydb.close()
+        # Überprüfen, ob der Benutzer eine Lehrkraft ist
+        cursor.execute("SELECT rollen_id FROM `user` WHERE id = %s", (user_id,))
+        rolle = cursor.fetchone()[0]
 
-        return render_template('ticketseite.html', user_id=user_id, tickets=tickets)
-
+        if rolle == 1:  # 1 entspricht der Rolle "Lehrkraft"
+            form = TicketForm()
+            if form.validate_on_submit():
+                try:
+                    # Ticketdaten in die Datenbank einfügen
+                    sql = "INSERT INTO ticket (user_id, raum_id, title, beschreibung, status_id, erstellungsdatum) VALUES (%s, %s, %s, %s, %s, CURDATE())"
+                    val = (user_id, form.raum.data, form.titel.data, form.beschreibung.data, 1)  # 1 entspricht dem Status "offen"
+                    cursor.execute(sql, val)
+                    mydb.commit()
+                    flash('Ticket erfolgreich erstellt!')
+                    return redirect(url_for('index'))
+                except mysql.connector.Error as err:
+                    print(f"Fehler beim Einfügen des Tickets: {err}")
+                    flash('Fehler beim Erstellen des Tickets.')
+                finally:
+                    if mydb.is_connected():
+                        cursor.close()
+                        mydb.close()
+            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, form=form,rolle=rolle)
+        else:
+            cursor.close()
+            mydb.close()
+            return render_template('ticketseite.html', user_id=user_id, tickets=tickets)
     else:
-        return render_template((url_for('login')))
+        # Benutzer ist nicht angemeldet
+        return redirect(url_for('login'))
     
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -128,16 +162,7 @@ def login():
                 mydb.close()
     return render_template('login.html', title='Anmelden', form=form, error=error)
 
-@app.route('/index')
-def index():
-    if 'user_id' in session:
-        # Benutzer ist angemeldet
-        user_id = session['user_id']
-        # ... hier kannst du die Benutzerdaten laden und im Template verwenden ...
-        return render_template('ticketseite.html', user_id=user_id) 
-    else:
-        # Benutzer ist nicht angemeldet
-        return redirect(url_for('login'))
+
 
 @app.route('/logout')
 def logout():
