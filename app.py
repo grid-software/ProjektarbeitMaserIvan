@@ -19,8 +19,7 @@ def get_db_connection():
     )
     return mydb
 
-@app.route('/', methods=['GET','POST'])
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if 'user_id' in session:
         # Benutzer ist angemeldet
@@ -28,21 +27,39 @@ def index():
         mydb = get_db_connection()
         cursor = mydb.cursor()
 
-        # Abrufen der Tickets für den angemeldeten Benutzer
-        cursor.execute("""
-            SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname 
-            FROM ticket t 
-            JOIN `user` u ON t.user_id = u.id 
-            JOIN status s ON t.status_id = s.id 
-            JOIN raum r ON t.raum_id = r.id  
-            WHERE t.user_id = %s
-        """, (user_id,))
-        tickets = cursor.fetchall() 
-        tickets = cursor.fetchall()
+        # Benutzernamen abrufen
+        cursor.execute("SELECT vorname, nachname FROM `user` WHERE id = %s", (user_id,))
+        user_name = cursor.fetchone()
+        vorname = user_name[0]
+        nachname = user_name[1]
 
         # Überprüfen, ob der Benutzer eine Lehrkraft ist
         cursor.execute("SELECT rollen_id FROM `user` WHERE id = %s", (user_id,))
         rolle = cursor.fetchone()[0]
+
+        # Abrufen der Tickets für den angemeldeten Benutzer
+        if rolle == 1:  # 1 entspricht der Rolle "Lehrkraft"
+            cursor.execute("""
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum
+                FROM ticket t 
+                JOIN `user` u ON t.user_id = u.id 
+                JOIN status s ON t.status_id = s.id 
+                JOIN raum r ON t.raum_id = r.id  
+                WHERE t.user_id = %s
+            """, (user_id,))
+            tickets = cursor.fetchall()
+
+        else:  # Raumbetreuer
+            cursor.execute("""
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum
+                FROM ticket t 
+                JOIN `user` u ON t.user_id = u.id 
+                JOIN status s ON t.status_id = s.id 
+                JOIN raum r ON t.raum_id = r.id  
+                WHERE r.raumbetreuuer = %s  --  <-- Änderung: Filterung nach Raumbetreuer
+            """, (user_id,))
+            tickets = cursor.fetchall()
+
 
         if rolle == 1:  # 1 entspricht der Rolle "Lehrkraft"
             form = TicketForm()
@@ -62,13 +79,29 @@ def index():
                     if mydb.is_connected():
                         cursor.close()
                         mydb.close()
-            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, form=form,rolle=rolle)
+            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, form=form, rolle=rolle, vorname=vorname, nachname=nachname)
         else:
-            cursor.close()
-            mydb.close()
-            return render_template('ticketseite.html', user_id=user_id, tickets=tickets)
-    else:
+            # Formular zur Statusänderung
+            if request.method == 'POST':
+                try:
+                    ticket_id = request.form['ticket_id']
+                    neuer_status = request.form['status']
+                    # Status in der Datenbank aktualisieren
+                    cursor.execute("UPDATE ticket SET status_id = %s WHERE id = %s", (neuer_status, ticket_id))
+                    mydb.commit()
+                    flash('Status erfolgreich aktualisiert!')
+                    return redirect(url_for('index'))  # Seite neu laden, um die Änderungen anzuzeigen
+                except mysql.connector.Error as err:
+                    print(f"Fehler beim Aktualisieren des Status: {err}")
+                    flash('Fehler beim Aktualisieren des Status.')
+                finally:
+                    if mydb.is_connected():
+                        cursor.close()
+                        mydb.close()
 
+            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname)
+
+    else:
         return redirect((url_for('login')))
 
     
