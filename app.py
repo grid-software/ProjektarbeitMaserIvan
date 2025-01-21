@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, url_for, request, jsonify
+from flask import Flask, render_template, flash, redirect, url_for, request, jsonify, session
 from forms import RegistrationForm, LoginForm
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,7 @@ import mysql.connector
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.secret_key = 'extremgeheimerkey'  # Ersetze dies durch einen sicheren Schlüssel!
 
 # Funktion für die Datenbankverbindung
 def get_db_connection():
@@ -16,6 +17,26 @@ def get_db_connection():
         database="ticketsystem"
     )
     return mydb
+
+@app.route('/', methods=['GET','POST'])
+def Ticketsystem():
+    if 'user_id' in session:
+        user_id = session['user_id']
+        mydb = get_db_connection()
+        cursor = mydb.cursor()
+
+        # Hier musst du die Abfrage an deine Tabellenstruktur anpassen
+        cursor.execute("SELECT t.id, t.title, s.beschreibung as status FROM ticket t JOIN `user` u ON t.user_id = u.id JOIN status s ON t.status_id = s.id WHERE u.id = %s", (user_id,))
+        tickets = cursor.fetchall()
+
+        cursor.close()
+        mydb.close()
+
+        return render_template('ticketseite.html', user_id=user_id, tickets=tickets)
+
+    else:
+        return render_template((url_for('login')))
+    
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -81,7 +102,7 @@ def raum_auswahl(user_id):
 
     return render_template('raum_auswahl.html', title='Räume auswählen', räume=räume, user_id=user_id)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     error = None
@@ -94,6 +115,7 @@ def login():
 
             if user and check_password_hash(user[7], form.kennwort.data):
                 flash('Anmeldung erfolgreich!')
+                session['user_id'] = user[0]  # Benutzer-ID in der Sitzung speichern
                 return redirect(url_for('index'))
             else:
                 error = 'Ungültige E-Mail-Adresse oder Passwort'
@@ -108,12 +130,23 @@ def login():
 
 @app.route('/index')
 def index():
-    return "Wilkommen test"
+    if 'user_id' in session:
+        # Benutzer ist angemeldet
+        user_id = session['user_id']
+        # ... hier kannst du die Benutzerdaten laden und im Template verwenden ...
+        return render_template('ticketseite.html', user_id=user_id) 
+    else:
+        # Benutzer ist nicht angemeldet
+        return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)  # Benutzer aus der Sitzung entfernen
+    return redirect(url_for('login'))
 
 @app.route('/keinRaum')
 def keinRaum():
     return render_template('kein_Raum.html')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
