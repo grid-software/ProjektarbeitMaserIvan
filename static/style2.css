@@ -1,31 +1,24 @@
-/* Hintergrundfarbe und Zentrierung der Seite */
 body, html {
     height: 100%;
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa; /* Sehr helles Grau */
+    background-color: #f8f9fa;
     display: flex;
-    flex-direction: column; /* Die Elemente vertikal anordnen */
-    justify-content: flex-start; /* Elemente am oberen Rand positionieren */
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
 }
-
-/* Container für das Formular - Maximale Breite */
 .container {
     max-width: 800px;
     width: 100%;
     padding: 15px;
-    margin-top: 20px; /* Platz zwischen Formular und Überschrift */
+    margin-top: 20px;
 }
-
-/* Header-Styling für die Überschrift */
 .text-center h1 {
-    color: #000000; /* Schwarz für die Schrift */
+    color: #000000; 
     font-weight: bold;
-    margin-bottom: 20px; /* Abstand zur nächsten Sektion */
+    margin-bottom: 20px; 
 }
-
-/* Formularcontainer */
 .card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -35,8 +28,6 @@ body, html {
     flex-direction: column;
     align-items: center;
 }
-
-/* Formularfelder */
 .form-control, .form-select {
     width: 100%;
     max-width: 500px;
@@ -45,15 +36,11 @@ body, html {
     border: 1px solid #ced4da;
     margin-bottom: 15px;
 }
-
-/* Form-Label */
 .form-label {
     width: 100%;
-    display: block;  /* Sicherstellen, dass Labels untereinander und nicht nebeneinander angezeigt werden */
+    display: block;  
     margin-bottom: 5px;
 }
-
-/* Styling für den Button */
 .btn-success {
     background-color: #28a745;
     border-color: #28a745;
@@ -64,19 +51,13 @@ body, html {
     width: 100%;
     max-width: 500px;
 }
-
-/* Hover Effekt für den Button */
 .btn-success:hover {
     background-color: #218838;
     border-color: #1e7e34;
 }
-
-/* Optional: Styling für das "Räume"-Feld */
 #räume-feld {
     display: none;
 }
-
-/* Optional: Anpassen für kleine Bildschirme */
 @media (max-width: 576px) {
     .container {
         padding: 15px;

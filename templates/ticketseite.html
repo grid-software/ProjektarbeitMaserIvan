@@ -32,7 +32,6 @@
 
   <div class="container mt-4">
     {% if user_id %}
-      <!-- Benutzerangemeldet Bereich -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="text-muted">
           <strong>Angemeldet als:</strong> <span class="text-dark">{{ vorname }} {{ nachname }}</span>
@@ -43,7 +42,6 @@
       </div>
 
       {% if rolle == 1 %}
-        <!-- Ticket erstellen Container -->
         <div class="container mt-4 p-4 border rounded shadow-sm" style="background-color: #f9f9f9;">
           <h2>Ticket erstellen:</h2>
           <form method="POST">
@@ -68,11 +66,7 @@
           </form>
         </div>
       {% endif %}
-
-      <!-- Abstand zwischen den Containern -->
       <div class="mt-5"></div>
-
-      <!-- Ticket Übersicht Container -->
       <div class="container mt-4 p-4 border rounded shadow-sm" style="background-color: #f9f9f9;">
         <h2>Ihre Tickets:</h2>
         <!-- Responsiv machen mit table-responsive -->

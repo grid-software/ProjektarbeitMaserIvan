@@ -1,45 +1,36 @@
-/* Allgemeine Hintergrundfarbe und Schrift für den Body */
 body, html {
     height: 100%;
     margin: 0;
     font-family: 'Arial', sans-serif;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Vertikal zentrieren */
-    align-items: center; /* Horizontal zentrieren */
-    background-color: #f8f9fa; /* Sehr helles Grau als Hintergrund */
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
 }
-
-/* Container für den oberen Bereich (Elektronikschule) */
 .container {
     padding: 10px;
-    max-width: 800px; /* Maximale Breite für den Container */
+    max-width: 800px; 
 }
-
-/* Anpassungen für den Bereich 'Elektronikschule' */
 .elektronik-container {
     text-align: center;
-    background-color: transparent; /* Kein Hintergrund */
-    padding: 0; /* Kein extra Padding */
-    font-size: 2rem; /* Größere Schrift */
+    background-color: transparent;
+    padding: 0;
+    font-size: 2rem;
     font-weight: bold;
     letter-spacing: 1px;
     text-align: center;
-    color: #333; /* Dunkle Schriftfarbe */
-    margin-bottom: 30px; /* Abstand nach unten zum Formular */
+    color: #333; 
+    margin-bottom: 30px;
 }
-
-/* Stile für das Anmeldeformular */
 .card {
     border-radius: 10px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
     padding: 30px;
     width: 100%;
-    max-width: 500px; /* Maximale Breite des Formulars */
+    max-width: 500px;
 }
-
-/* Eingabefelder (Email und Passwort) */
 .form-control {
     border-radius: 8px;
     border: 1px solid #ced4da;
@@ -47,36 +38,26 @@ body, html {
     margin-bottom: 15px;
     width: 100%;
 }
-
-/* Eingabefelder, wenn sie im Fokus sind */
 .form-control:focus {
     border-color: #5cb85c;
     box-shadow: 0 0 5px rgba(92, 184, 92, 0.5);
 }
-
-/* Grüne Schaltfläche für den Login */
 .btn-primary {
-    background-color: #28a745; /* Grün */
-    border-color: #28a745; /* Grün */
+    background-color: #28a745;
+    border-color: #28a745;
     padding: 12px;
     font-size: 16px;
     border-radius: 8px;
     font-weight: bold;
-    width: 100%; /* Schaltfläche über die ganze Breite */
+    width: 100%;
 }
-
-/* Schaltfläche, wenn sie im Hover-Zustand ist */
 .btn-primary:hover {
-    background-color: #218838; /* Dunkleres Grün */
+    background-color: #218838; 
     border-color: #1e7e34;
 }
-
-/* Abstand für den Text 'Oder Registrieren' */
 .mt-3 {
     margin-top: 20px;
 }
-
-/* Styling für Fehlermeldung */
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
@@ -84,28 +65,22 @@ body, html {
     padding: 15px;
     border-radius: 5px;
 }
-
-/* Styling für Links */
 a {
     color: #007bff;
     text-decoration: none;
 }
-
 a:hover {
     text-decoration: underline;
 }
-
-/* Formularfeld-Breite für gleiche Länge von E-Mail und Passwort */
 .form-group {
     display: flex;
     flex-direction: column;
 }
-
 .form-group .form-control {
-    width: 90%;  /* Felder sollen die volle Breite ausfüllen */
+    width: 90%; 
 }
 .form-label {
-    width: 100%; /* Labels sollen die volle Breite ausfüllen */
-    display: inline-block; /* Damit Labels und Eingabefelder nebeneinander ausgerichtet werden */
-    margin-bottom: 0.5rem; /* Abstand nach unten für die Labels */
+    width: 100%; 
+    display: inline-block; 
+    margin-bottom: 0.5rem; 
 }
