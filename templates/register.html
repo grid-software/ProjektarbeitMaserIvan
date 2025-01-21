@@ -2,43 +2,92 @@
 <html>
   <head>
     <title>{{ title }} - Registrieren</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="..\static\style2.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUa3YAHiv73oS0gYcfhOdHRiW1vE1c2DtwQyPIpTVTBHG7STHqBEiMykGk8J" crossorigin="anonymous">
   </head>
   <body>
-    <h1>Registrieren</h1>
-    <form method="POST">
-      {{ form.hidden_tag() }}
-      <p>
-        {{ form.vorname.label }}<br> {{ form.vorname(size=32) }}
-      </p>
-      <p>
-        {{ form.nachname.label }}<br> {{ form.nachname(size=32) }}
-      </p>
-      <p>
-        {{ form.email.label }}<br> {{ form.email(size=64) }}
-      </p>
-      <p>
-        {{ form.plz.label }}<br> {{ form.plz(size=5) }}
-      </p>
-      <p>
-        {{ form.stadt.label }}<br> {{ form.stadt(size=32) }}
-      </p>
-      <p>
-        {{ form.strasse.label }}<br> {{ form.strasse(size=64) }}
-      </p>
-      <p>
-        {{ form.kennwort.label }}<br> {{ form.kennwort(size=32) }}
-      </p>
-      <p>
-        {{ form.kennwort2.label }}<br> {{ form.kennwort2(size=32) }}
-      </p>
-      <p>
-        {{ form.rolle.label }}<br> {{ form.rolle }}
-      </p>
-      <p id="räume-feld" style="display: none;">  
-        {{ form.räume.label }}<br> {{ form.räume }}
-      </p>
-      <p>{{ form.submit() }}</p>
-    </form>
+    <div class="container mt-5">
+        <!-- Header: Registrieren -->
+        <div class="text-center mb-4">
+            <h1>Registrieren bei der Elektronikschule</h1>
+        </div>
 
+        <!-- Registrierungsformular -->
+        <div class="card p-4 shadow-lg">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <!-- Vorname -->
+                <div class="mb-3">
+                    <label for="vorname" class="form-label">{{ form.vorname.label }}</label>
+                    {{ form.vorname(class="form-control") }}
+                </div>
+
+                <!-- Nachname -->
+                <div class="mb-3">
+                    <label for="nachname" class="form-label">{{ form.nachname.label }}</label>
+                    {{ form.nachname(class="form-control") }}
+                </div>
+
+                <!-- E-Mail -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">{{ form.email.label }}</label>
+                    {{ form.email(class="form-control") }}
+                </div>
+
+                <!-- PLZ -->
+                <div class="mb-3">
+                    <label for="plz" class="form-label">{{ form.plz.label }}</label>
+                    {{ form.plz(class="form-control") }}
+                </div>
+
+                <!-- Stadt -->
+                <div class="mb-3">
+                    <label for="stadt" class="form-label">{{ form.stadt.label }}</label>
+                    {{ form.stadt(class="form-control") }}
+                </div>
+
+                <!-- Straße -->
+                <div class="mb-3">
+                    <label for="strasse" class="form-label">{{ form.strasse.label }}</label>
+                    {{ form.strasse(class="form-control") }}
+                </div>
+
+                <!-- Passwort -->
+                <div class="mb-3">
+                    <label for="kennwort" class="form-label">{{ form.kennwort.label }}</label>
+                    {{ form.kennwort(class="form-control") }}
+                </div>
+
+                <!-- Passwort Bestätigung -->
+                <div class="mb-3">
+                    <label for="kennwort2" class="form-label">{{ form.kennwort2.label }}</label>
+                    {{ form.kennwort2(class="form-control") }}
+                </div>
+
+                <!-- Rolle -->
+                <div class="mb-3">
+                    <label for="rolle" class="form-label">{{ form.rolle.label }}</label>
+                    {{ form.rolle(class="form-select") }}
+                </div>
+
+                <!-- Räume (optional) -->
+                <div class="mb-3" id="räume-feld" style="display: none;">
+                    <label for="räume" class="form-label">{{ form.räume.label }}</label>
+                    {{ form.räume(class="form-control") }}
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success w-100">Registrieren</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -1,0 +1,81 @@
+/* Hintergrundfarbe und Zentrierung der Seite */
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa; /* Sehr helles Grau */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Container für das Formular - Breiterer Container */
+.container {
+    max-width: 800px; /* Maximale Breite für das Formular */
+}
+
+/* Stil für den Formularcontainer */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+/* Stil für die Formulareingabefelder */
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px;  /* Weniger Padding für kleinere Eingabefelder */
+    border: 1px solid #ced4da;
+    margin-bottom: 15px;  /* Weniger Abstand zwischen den Feldern */
+}
+
+/* Stil für den Button */
+.btn-success {
+    background-color: #28a745; /* Grüner Hintergrund */
+    border-color: #28a745;
+    font-weight: bold;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+}
+
+/* Hover Effekt für den Button */
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Textzentrierung für den Header */
+.text-center {
+    text-align: center;
+}
+
+/* Optional: Styling für das "Räume"-Feld, falls es angezeigt wird */
+#räume-feld {
+    display: none;
+}
+
+/* Zusätzlicher Abstand oben für die Seite */
+.mt-5 {
+    margin-top: 50px;
+}
+
+/* Styling für den Registrierungsheader */
+h1 {
+    color: #000000; /* Blau für den Header */
+    font-weight: bold;
+}
+
+/* Optional: Zusätzlicher Abstand zwischen Formularfeldern */
+.mb-3 {
+    margin-bottom: 15px;  /* Weniger Abstand zwischen den Feldern */
+}
+
+/* Optional: Anpassung für kleine Bildschirme */
+@media (max-width: 576px) {
+    .container {
+        padding: 15px;
+    }
+}
