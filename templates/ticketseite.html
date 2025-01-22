@@ -3,11 +3,12 @@
 <head>
   <title>Ticketseite</title>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="..\static\style3.css">
+
 </head>
 <body>
-  <!-- Navbar mit angepasster Farbe -->
   <nav class="navbar navbar-expand-lg" style="background-color: #f8f9fa;">
     <div class="container-fluid">
       <strong class="navbar-brand">Ticketseite der Elektronikschule</strong>
@@ -36,6 +37,15 @@
         <div class="text-muted">
           <strong>Angemeldet als:</strong> <span class="text-dark">{{ vorname }} {{ nachname }}</span>
         </div>
+        <div class="text-muted">
+          <strong>Rolle:</strong> 
+          {% if rolle ==1%}
+          <span class="text-dark">Lehrer</span>
+          {% else %}
+          <span class="text-dark">Raumbetreuuer</span>
+          {%endif%}
+        </div>
+
         <a href="{{ url_for('logout') }}">
           <button class="btn btn-danger">Abmelden</button>
         </a>
@@ -59,7 +69,6 @@
               {{ form.raum(class="form-control", id="raum") }}
             </div>
 
-            <!-- Bestätigen Button zentrieren und grün machen -->
             <div class="text-center">
               <button type="submit" class="btn btn-success">Bestätigen</button>
             </div>
@@ -69,7 +78,6 @@
       <div class="mt-5"></div>
       <div class="container mt-4 p-4 border rounded shadow-sm" style="background-color: #f9f9f9;">
         <h2>Ihre Tickets:</h2>
-        <!-- Responsiv machen mit table-responsive -->
         <div class="table-responsive">
           <table class="table table-striped table-bordered table-hover">
             <thead>
@@ -77,6 +85,7 @@
                 <th>Ticket-ID</th>
                 <th>Titel</th>
                 <th>Status</th>
+                <th>Beschreibung</th>
                 <th>Raum</th>
                 <th>Lehrer</th>
                 <th>Erstellungsdatum</th>
@@ -85,34 +94,38 @@
             </thead>
             <tbody>
               {% for ticket in tickets %}
-                <tr>
-                  <td>{{ ticket[0] }}</td>
-                  <td>{{ ticket[1] }}</td>
-                  <td>
-                    {% if ticket[2] == 1 %}
-                      <span class="badge bg-danger">Offen</span>
-                    {% elif ticket[2] == 3 %}
-                      <span class="badge bg-warning">In Bearbeitung</span>
-                    {% else %}
-                      <span class="badge bg-success">Fertig</span>
-                    {% endif %}
-                  </td>
-                  <td>{{ ticket[3] }}</td>
-                  <td>{{ ticket[4] }} {{ ticket[5] }}</td>
-                  <td>{{ ticket[6] }}</td>
-                  <td>
-                    <form method="POST">
-                      <input type="hidden" name="ticket_id" value="{{ ticket[0] }}">
-                      <select name="status" class="form-select">
-                        <option value="1" {% if ticket[2] == 1 %}selected{% endif %}>Offen</option>
-                        <option value="3" {% if ticket[2] == 3 %}selected{% endif %}>In Bearbeitung</option>
-                        <option value="2" {% if ticket[2] == 2 %}selected{% endif %}>Fertig</option>
-                      </select>
-                      <input type="submit" class="btn btn-primary mt-2" value="Ändern">
-                    </form>
-                  </td>
-                </tr>
-              {% endfor %}
+
+  <tr>
+    <td>{{ ticket[0] }}</td>
+    <td>{{ ticket[1] }}</td>
+    <td>
+      {% if ticket[7] == 1 %}
+        <span class="badge bg-warning">offen</span>
+      {% elif ticket[7] == 3 %}
+        <span class="badge bg-primary">in Bearbeitung</span>
+      {% elif ticket[7] == 2 %}
+        <span class="badge bg-success">fertig</span>
+      {% endif %}
+    </td>
+    <td>{{ ticket[8] }}</td> 
+    <td>{{ ticket[3] }}</td>
+    <td>{{ ticket[4] }} {{ ticket[5] }}</td>
+    <td>{{ ticket[6] }}</td>
+   
+    <td>
+      <form method="POST">
+        {{ form.csrf_token }}  <input type="hidden" name="ticket_id" value="{{ ticket[0] }}">
+        <select name="status" class="form-select">
+          <option value="1" {% if ticket[2] == 1 %}selected{% endif %}>Offen</option>
+          <option value="3" {% if ticket[2] == 3 %}selected{% endif %}>In Bearbeitung</option>
+          <option value="2" {% if ticket[2] == 2 %}selected{% endif %}>Fertig</option>
+        </select>
+        <input type="submit" class="btn btn-primary mt-2" value="Ändern">
+      </form>
+    </td>
+  </tr>
+{% endfor %}
+
             </tbody>
           </table>
         </div>

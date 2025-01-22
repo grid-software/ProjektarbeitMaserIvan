@@ -1,108 +1,97 @@
-from flask import Flask, render_template, flash, redirect, url_for, request, jsonify, session
+from flask import Flask, render_template, flash, redirect, url_for, request, session
 from forms import RegistrationForm, LoginForm, TicketForm
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
-from wtforms import fields
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.secret_key = 'extremgeheimerkey'  # Ersetze dies durch einen sicheren Schlüssel!
+app.secret_key = 'extremgeheimerkey'
 
-# Funktion für die Datenbankverbindung
 def get_db_connection():
-    mydb = mysql.connector.connect(
-        host="127.0.0.1",
-        user="root",
-        password="",
-        database="ticketsystem"
-    )
-    return mydb
+    try:
+        mydb = mysql.connector.connect(
+            host="127.0.0.1",
+            user="root",
+            password="",
+            database="ticketsystem"
+        )
+        return mydb
+    except mysql.connector.Error as err:
+        print(f"Fehler bei der Datenbankverbindung: {err}")
+        return None
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if 'user_id' in session:
-        # Benutzer ist angemeldet
-        user_id = session['user_id']
-        mydb = get_db_connection()
-        cursor = mydb.cursor()
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
-        # Benutzernamen abrufen
+    user_id = session['user_id']
+    mydb = get_db_connection()
+    if mydb is None:
+        flash('Fehler bei der Datenbankverbindung.')
+        return render_template('ticketseite.html', user_id=user_id, tickets=[], rolle=0, vorname="", nachname="")
+
+    cursor = mydb.cursor()
+    tickets = []
+    rolle = 0
+    vorname = ""
+    nachname = ""
+
+    try:
         cursor.execute("SELECT vorname, nachname FROM `user` WHERE id = %s", (user_id,))
-        user_name = cursor.fetchone()
-        vorname = user_name[0]
-        nachname = user_name[1]
+        user_data = cursor.fetchone()
+        if user_data:
+            vorname, nachname = user_data
 
-        # Überprüfen, ob der Benutzer eine Lehrkraft ist
         cursor.execute("SELECT rollen_id FROM `user` WHERE id = %s", (user_id,))
-        rolle = cursor.fetchone()[0]
+        rolle_data = cursor.fetchone()
+        if rolle_data:
+            rolle = rolle_data[0]
 
-        # Abrufen der Tickets für den angemeldeten Benutzer
-        if rolle == 1:  # 1 entspricht der Rolle "Lehrkraft"
-            cursor.execute("""
-                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum
-                FROM ticket t 
-                JOIN `user` u ON t.user_id = u.id 
-                JOIN status s ON t.status_id = s.id 
-                JOIN raum r ON t.raum_id = r.id  
+        if rolle == 1:
+            sql = """
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung 
+                FROM ticket t
+                JOIN `user` u ON t.user_id = u.id
+                JOIN status s ON t.status_id = s.id
+                JOIN raum r ON t.raum_id = r.id
                 WHERE t.user_id = %s
-            """, (user_id,))
-            tickets = cursor.fetchall()
-
-        else:  # Raumbetreuer
-            cursor.execute("""
-                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum
-                FROM ticket t 
-                JOIN `user` u ON t.user_id = u.id 
-                JOIN status s ON t.status_id = s.id 
-                JOIN raum r ON t.raum_id = r.id  
-                WHERE r.raumbetreuuer = %s  --  <-- Änderung: Filterung nach Raumbetreuer
-            """, (user_id,))
-            tickets = cursor.fetchall()
-
-
-        if rolle == 1:  # 1 entspricht der Rolle "Lehrkraft"
-            form = TicketForm()
-            if form.validate_on_submit():
-                try:
-                    # Ticketdaten in die Datenbank einfügen
-                    sql = "INSERT INTO ticket (user_id, raum_id, title, beschreibung, status_id, erstellungsdatum) VALUES (%s, %s, %s, %s, %s, CURDATE())"
-                    val = (user_id, form.raum.data, form.titel.data, form.beschreibung.data, 1)  # 1 entspricht dem Status "offen"
-                    cursor.execute(sql, val)
-                    mydb.commit()
-                    flash('Ticket erfolgreich erstellt!')
-                    return redirect(url_for('index'))
-                except mysql.connector.Error as err:
-                    print(f"Fehler beim Einfügen des Tickets: {err}")
-                    flash('Fehler beim Erstellen des Tickets.')
-                finally:
-                    if mydb.is_connected():
-                        cursor.close()
-                        mydb.close()
-            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, form=form, rolle=rolle, vorname=vorname, nachname=nachname)
+            """
         else:
-            # Formular zur Statusänderung
-            if request.method == 'POST':
-                try:
-                    ticket_id = request.form['ticket_id']
-                    neuer_status = request.form['status']
-                    # Status in der Datenbank aktualisieren
-                    cursor.execute("UPDATE ticket SET status_id = %s WHERE id = %s", (neuer_status, ticket_id))
-                    mydb.commit()
-                    flash('Status erfolgreich aktualisiert!')
-                    return redirect(url_for('index'))  # Seite neu laden, um die Änderungen anzuzeigen
-                except mysql.connector.Error as err:
-                    print(f"Fehler beim Aktualisieren des Status: {err}")
-                    flash('Fehler beim Aktualisieren des Status.')
-                finally:
-                    if mydb.is_connected():
-                        cursor.close()
-                        mydb.close()
+            sql = """
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung 
+                FROM ticket t
+                JOIN `user` u ON t.user_id = u.id
+                JOIN status s ON t.status_id = s.id
+                JOIN raum r ON t.raum_id = r.id
+                WHERE r.raumbetreuuer = %s
+            """
+        cursor.execute(sql, (user_id,))
+        tickets = cursor.fetchall()
 
-            return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname)
+        if request.method == 'POST' and 'status' in request.form and 'ticket_id' in request.form:
+            ticket_id = request.form['ticket_id']
+            neuer_status = request.form['status']
+            cursor.execute("UPDATE ticket SET status_id = %s WHERE id = %s", (neuer_status, ticket_id))
+            mydb.commit()
+            flash('Status erfolgreich aktualisiert!')
+            return redirect(url_for('index'))
 
+    except mysql.connector.Error as err:
+        print(f"Fehler bei der Datenbankabfrage: {err}")
+        flash('Fehler bei der Datenbankabfrage.')
+    finally:
+        if mydb:  # Nur schließen, wenn mydb nicht None ist
+            cursor.close()
+            mydb.close()
+
+    if rolle == 1:
+        form = TicketForm()
+        return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname, form=form)
     else:
-        return redirect((url_for('login')))
+        return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname)
+
 
     
 
