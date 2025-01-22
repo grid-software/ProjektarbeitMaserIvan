@@ -1,10 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keine freien Räume</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Keine freien Räume verfügbar.</h1>
-  <p><a href="{{ url_for('login') }}"><button>Zurück zur Anmeldung</button></a></p>
+<body class="bg-light">
+  <header class="bg-white shadow-sm py-3 mb-5">
+    <div class="container text-center">
+      <h1 class="fw-bold">Elektronikschule</h1>
+    </div>
+  </header>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 text-center">
+        <div class="p-4 border rounded shadow-sm bg-white">
+          <h1 class="display-5 text-danger mb-4">Keine freien Räume verfügbar</h1>
+          <p class="lead mb-4">Es sind derzeit keine freien Räume verfügbar. Bitte versuchen Sie es später erneut.</p>
+          <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Zurück zur Anmeldung</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
