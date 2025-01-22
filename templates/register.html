@@ -9,77 +9,52 @@
   </head>
   <body>
     <div class="container mt-5">
-        <!-- Header: Registrieren -->
         <div class="text-center mb-4">
             <h1>Registrieren bei der Elektronikschule</h1>
         </div>
-
-        <!-- Registrierungsformular -->
         <div class="card p-4 shadow-lg">
             <form method="POST">
                 {{ form.hidden_tag() }}
-
-                <!-- Vorname -->
                 <div class="mb-3">
                     <label for="vorname" class="form-label">{{ form.vorname.label }}</label>
                     {{ form.vorname(class="form-control") }}
                 </div>
-
-                <!-- Nachname -->
                 <div class="mb-3">
                     <label for="nachname" class="form-label">{{ form.nachname.label }}</label>
                     {{ form.nachname(class="form-control") }}
                 </div>
-
-                <!-- E-Mail -->
                 <div class="mb-3">
                     <label for="email" class="form-label">{{ form.email.label }}</label>
                     {{ form.email(class="form-control") }}
                 </div>
-
-                <!-- PLZ -->
                 <div class="mb-3">
                     <label for="plz" class="form-label">{{ form.plz.label }}</label>
                     {{ form.plz(class="form-control") }}
                 </div>
-
-                <!-- Stadt -->
                 <div class="mb-3">
                     <label for="stadt" class="form-label">{{ form.stadt.label }}</label>
                     {{ form.stadt(class="form-control") }}
                 </div>
-
-                <!-- Straße -->
                 <div class="mb-3">
                     <label for="strasse" class="form-label">{{ form.strasse.label }}</label>
                     {{ form.strasse(class="form-control") }}
                 </div>
-
-                <!-- Passwort -->
                 <div class="mb-3">
                     <label for="kennwort" class="form-label">{{ form.kennwort.label }}</label>
                     {{ form.kennwort(class="form-control") }}
                 </div>
-
-                <!-- Passwort Bestätigung -->
                 <div class="mb-3">
                     <label for="kennwort2" class="form-label">{{ form.kennwort2.label }}</label>
                     {{ form.kennwort2(class="form-control") }}
                 </div>
-
-                <!-- Rolle -->
                 <div class="mb-3">
                     <label for="rolle" class="form-label">{{ form.rolle.label }}</label>
                     {{ form.rolle(class="form-select") }}
                 </div>
-
-                <!-- Räume (optional) -->
                 <div class="mb-3" id="räume-feld" style="display: none;">
                     <label for="räume" class="form-label">{{ form.räume.label }}</label>
                     {{ form.räume(class="form-control") }}
                 </div>
-
-                <!-- Submit Button -->
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-success w-100">Registrieren</button>
                 </div>
