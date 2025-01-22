@@ -89,7 +89,9 @@
                 <th>Raum</th>
                 <th>Lehrer</th>
                 <th>Erstellungsdatum</th>
+                {% if rolle == 2 %} 
                 <th>Aktionen</th>
+                {%endif%}
               </tr>
             </thead>
             <tbody>
@@ -111,18 +113,19 @@
     <td>{{ ticket[3] }}</td>
     <td>{{ ticket[4] }} {{ ticket[5] }}</td>
     <td>{{ ticket[6] }}</td>
-   
+    {% if rolle == 2 %}  
     <td>
       <form method="POST">
         {{ form.csrf_token }}  <input type="hidden" name="ticket_id" value="{{ ticket[0] }}">
         <select name="status" class="form-select">
-          <option value="1" {% if ticket[2] == 1 %}selected{% endif %}>Offen</option>
-          <option value="3" {% if ticket[2] == 3 %}selected{% endif %}>In Bearbeitung</option>
-          <option value="2" {% if ticket[2] == 2 %}selected{% endif %}>Fertig</option>
+          <option value="1" {% if ticket[7] == 1 %}selected{% endif %}>Offen</option>
+          <option value="3" {% if ticket[7] == 3 %}selected{% endif %}>In Bearbeitung</option>
+          <option value="2" {% if ticket[7] == 2 %}selected{% endif %}>Fertig</option>
         </select>
         <input type="submit" class="btn btn-primary mt-2" value="Ändern">
       </form>
     </td>
+    {%endif%}
   </tr>
 {% endfor %}
 

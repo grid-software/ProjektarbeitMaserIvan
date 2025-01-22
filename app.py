@@ -3,22 +3,25 @@ from forms import RegistrationForm, LoginForm, TicketForm
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
+from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.secret_key = 'extremgeheimerkey'
+app.secret_key = os.environ.get("SECRET_KEY") or "extremgeheimerkey"
 
 def get_db_connection():
     try:
         mydb = mysql.connector.connect(
-            host="127.0.0.1",
-            user="root",
-            password="",
-            database="ticketsystem"
+            host=os.environ.get("MYSQL_HOST") or "127.0.0.1",
+            user=os.environ.get("MYSQL_USER") or "root",
+            password=os.environ.get("MYSQL_PASSWORD") or "",
+            database=os.environ.get("MYSQL_DATABASE") or "ticketsystem"
         )
         return mydb
     except mysql.connector.Error as err:
         print(f"Fehler bei der Datenbankverbindung: {err}")
+        flash('Fehler bei der Datenbankverbindung.', 'danger')
         return None
 
 @app.route('/', methods=['GET', 'POST'])
@@ -29,14 +32,14 @@ def index():
     user_id = session['user_id']
     mydb = get_db_connection()
     if mydb is None:
-        flash('Fehler bei der Datenbankverbindung.')
-        return render_template('ticketseite.html', user_id=user_id, tickets=[], rolle=0, vorname="", nachname="")
+        return render_template('ticketseite.html', user_id=user_id, tickets=[], rolle=0, vorname="", nachname="", form=TicketForm())
 
     cursor = mydb.cursor()
     tickets = []
     rolle = 0
     vorname = ""
     nachname = ""
+    form = TicketForm()
 
     try:
         cursor.execute("SELECT vorname, nachname FROM `user` WHERE id = %s", (user_id,))
@@ -49,52 +52,67 @@ def index():
         if rolle_data:
             rolle = rolle_data[0]
 
-        if rolle == 1:
+        if rolle == 1: #Lehrer
+            if form.validate_on_submit():
+                try:
+                    jetzt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    sql = "INSERT INTO ticket (title, beschreibung, raum_id, user_id, erstellungsdatum, status_id) VALUES (%s, %s, %s, %s, %s, 1)"
+                    val = (form.titel.data, form.beschreibung.data, form.raum.data, user_id, jetzt)
+                    cursor.execute(sql, val)
+                    mydb.commit()
+                    flash('Ticket erfolgreich erstellt!', 'success')
+                    return redirect(url_for('index'))
+                except mysql.connector.Error as err:
+                    print(f"Fehler beim Einfügen des Tickets: {err}")
+                    flash('Fehler beim Erstellen des Tickets. Bitte versuchen Sie es erneut.', 'danger')
+
             sql = """
-                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung 
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung
                 FROM ticket t
                 JOIN `user` u ON t.user_id = u.id
                 JOIN status s ON t.status_id = s.id
                 JOIN raum r ON t.raum_id = r.id
                 WHERE t.user_id = %s
             """
-        else:
+            cursor.execute(sql, (user_id,))
+            tickets = cursor.fetchall()
+
+        elif rolle == 2: #Raumbetreuer
+            if request.method == 'POST' and 'status' in request.form and 'ticket_id' in request.form:
+                try:
+                    ticket_id = request.form['ticket_id']
+                    neuer_status = request.form['status']
+                    cursor.execute("UPDATE ticket SET status_id = %s WHERE id = %s", (neuer_status, ticket_id))
+                    mydb.commit()
+                    flash('Ticket Status erfolgreich geändert!', 'success')
+                    return redirect(url_for('index'))
+                except mysql.connector.Error as err:
+                    print(f"Fehler beim Ändern des Ticketstatus: {err}")
+                    flash('Fehler beim Ändern des Ticketstatus. Bitte versuchen Sie es erneut.', 'danger')
+
             sql = """
-                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung 
+                SELECT t.id, t.title, s.beschreibung as status, r.raum_code, u.vorname, u.nachname, t.erstellungsdatum, t.status_id, t.beschreibung
                 FROM ticket t
                 JOIN `user` u ON t.user_id = u.id
                 JOIN status s ON t.status_id = s.id
                 JOIN raum r ON t.raum_id = r.id
                 WHERE r.raumbetreuuer = %s
             """
-        cursor.execute(sql, (user_id,))
-        tickets = cursor.fetchall()
-
-        if request.method == 'POST' and 'status' in request.form and 'ticket_id' in request.form:
-            ticket_id = request.form['ticket_id']
-            neuer_status = request.form['status']
-            cursor.execute("UPDATE ticket SET status_id = %s WHERE id = %s", (neuer_status, ticket_id))
-            mydb.commit()
-            flash('Status erfolgreich aktualisiert!')
-            return redirect(url_for('index'))
+            cursor.execute(sql, (user_id,))
+            tickets = cursor.fetchall()
+        else:
+            flash("Unbekannte Rolle.", 'warning')
 
     except mysql.connector.Error as err:
         print(f"Fehler bei der Datenbankabfrage: {err}")
-        flash('Fehler bei der Datenbankabfrage.')
+        flash('Fehler bei der Datenbankabfrage.', 'danger')
+        return render_template('ticketseite.html', user_id=user_id, tickets=[], rolle=0, vorname="", nachname="", form=TicketForm())
     finally:
-        if mydb:  # Nur schließen, wenn mydb nicht None ist
+        if mydb:
             cursor.close()
             mydb.close()
 
-    if rolle == 1:
-        form = TicketForm()
-        return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname, form=form)
-    else:
-        return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname)
-
-
-    
-
+    return render_template('ticketseite.html', user_id=user_id, tickets=tickets, rolle=rolle, vorname=vorname, nachname=nachname, form=form)
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
